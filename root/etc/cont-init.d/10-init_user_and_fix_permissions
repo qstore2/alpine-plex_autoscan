@@ -1,5 +1,4 @@
 #!/usr/bin/with-contenv sh
-
 debug=false
 if [ $PLEX_AUTOSCAN_LOGLEVEL == "DEBUG" ]
 then

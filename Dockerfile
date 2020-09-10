@@ -6,33 +6,21 @@ LABEL maintainer=${COMMIT_AUTHOR} \
     org.label-schema.vcs-ref=${VCS_REF} \
     org.label-schema.vcs-url=${VCS_URL} \
     org.label-schema.build-date=${BUILD_DATE}
+
 RUN \
  echo "**** install build packages ****" && \
- echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositories && \
- apk --no-cache update -qq && apk --no-cache upgrade -qq && apk --no-cache fix -qq && \
- apk add --quiet --no-cache \
-        docker \
-        gcc \
-        git \
-        python3 \
-        python3-dev \
-        py3-pip \
-        musl-dev \
-        linux-headers \
-        curl \
-        grep \
-        shadow \
-        tzdata \
-        unzip \
-        wget \
-        bash
+  echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositories && \
+ apk --quiet --no-cache --no-progress add \
+       docker gcc git python3 python3-dev py3-pip musl-dev \
+        linux-headers curl grep shadow tzdata wget bash tar rclone && \
+        rm -rf /var/cache/apk/*
 
 RUN \
   echo "**** Install s6-overlay ****" && \ 
   curl -sX GET "https://api.github.com/repos/just-containers/s6-overlay/releases/latest" | awk '/tag_name/{print $4;exit}' FS='[""]' > /etc/S6_RELEASE && \
-  wget https://github.com/just-containers/s6-overlay/releases/download/`cat /etc/S6_RELEASE`/s6-overlay-amd64.tar.gz -O /tmp/s6-overlay-amd64.tar.gz && \
-  tar xzf /tmp/s6-overlay-amd64.tar.gz -C / && \
-  rm /tmp/s6-overlay-amd64.tar.gz && \
+  wget https://github.com/just-containers/s6-overlay/releases/download/`cat /etc/S6_RELEASE`/s6-overlay-amd64.tar.gz -O /tmp/s6-overlay-amd64.tar.gz >/dev/null 2>&1 && \
+  tar xzf /tmp/s6-overlay-amd64.tar.gz -C / >/dev/null 2>&1 && \
+  rm /tmp/s6-overlay-amd64.tar.gz >/dev/null 2>&1 && \
   echo "**** Installed s6-overlay `cat /etc/S6_RELEASE` ****"
 
 RUN \
@@ -41,13 +29,7 @@ RUN \
 
 RUN \
   echo "**** install plex_autoscan ****" && \
-  git clone --depth 1 --single-branch --branch develop https://github.com/l3uddz/plex_autoscan /opt/plex_autoscan
-
-RUN \
-  echo "**** install rclone ****" && \
-  wget https://downloads.rclone.org/rclone-current-linux-amd64.zip -O rclone.zip >/dev/null 2>&1 && \
-  unzip -qq rclone.zip && rm rclone.zip && \
-  mv rclone*/rclone /usr/bin && rm -rf rclone*
+  git clone --depth 1 --single-branch --branch develop https://github.com/doob187/plex_autoscan /opt/plex_autoscan
 
 ENV PATH=/opt/plex_autoscan:${PATH}
 COPY scan /opt/plex_autoscan
