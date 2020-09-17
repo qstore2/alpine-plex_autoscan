@@ -10,7 +10,7 @@ LABEL maintainer=${COMMIT_AUTHOR} \
 RUN \
  echo "**** install build packages ****" && \
   echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositories && \
-  apk --quiet --no-cache --no-progress add \
+ apk --quiet --no-cache --no-progress add \
        docker gcc git python3 python3-dev py3-pip musl-dev \
         linux-headers curl grep shadow tzdata wget bash tar rclone && \
         rm -rf /var/cache/apk/*
