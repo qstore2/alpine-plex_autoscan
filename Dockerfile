@@ -39,6 +39,9 @@ RUN \
     echo "**** install requirements ****" && \
     python3 -m pip -q install --no-cache-dir -r /opt/plex_autoscan/requirements.txt && \
     ln -s /opt/plex_autoscan/config /config
+RUN \ 
+    pip install pipupgrade && \
+    pipupgrade -q --latest --yes
 
 # environment variables to keep the init script clean
 ENV DOCKER_CONFIG=/home/plexautoscan/docker_config.json PLEX_AUTOSCAN_CONFIG=/config/config.json PLEX_AUTOSCAN_LOGFILE=/config/plex_autoscan.log PLEX_AUTOSCAN_LOGLEVEL=INFO PLEX_AUTOSCAN_QUEUEFILE=/config/queue.db PLEX_AUTOSCAN_CACHEFILE=/config/cache.db
