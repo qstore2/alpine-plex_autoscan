@@ -1,12 +1,4 @@
 FROM rclone/rclone
-ARG BUILD_DATE="unknown"
-ARG COMMIT_AUTHOR="unknown"
-ARG VCS_REF="unknown"
-ARG VCS_URL="unknown"
-LABEL maintainer=${COMMIT_AUTHOR} \
-    org.label-schema.vcs-ref=${VCS_REF} \
-    org.label-schema.vcs-url=${VCS_URL} \
-    org.label-schema.build-date=${BUILD_DATE}
 RUN ln /usr/local/bin/rclone /usr/bin/rclone
 RUN apk -U --no-cache add \
     docker gcc git python3 python3-dev py3-pip \
