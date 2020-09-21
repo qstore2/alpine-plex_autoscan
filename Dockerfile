@@ -17,6 +17,7 @@ RUN \
 RUN \
   curl -O https://downloads.rclone.org/v1.52.0/rclone-v1.52.0-linux-amd64.zip && \
   unzip -q rclone-v1.52.0-linux-amd64.zip && \
+  rm -f rclone-v1.52.0-linux-amd64.zip && \
   cd rclone-*-linux-amd64 && \
   cp rclone /usr/bin/
 
@@ -34,7 +35,7 @@ RUN \
 
 RUN \
   echo "**** install plex_autoscan ****" && \
-  git clone --depth 1 --single-branch --branch develop https://github.com/doob187/plex_autoscan /opt/plex_autoscan
+  git clone --depth 1 --single-branch --branch develop https://github.com/l3uddz/plex_autoscan /opt/plex_autoscan
 
 ENV PATH=/opt/plex_autoscan:${PATH}
 COPY scan /opt/plex_autoscan
