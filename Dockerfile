@@ -8,12 +8,17 @@ LABEL maintainer=${COMMIT_AUTHOR} \
     org.label-schema.build-date=${BUILD_DATE}
 
 RUN \
- echo "**** install build packages ****" && \
+  echo "**** install build packages ****" && \
   echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositories && \
- apk --quiet --no-cache --no-progress add \
+  apk --quiet --no-cache --no-progress add \
        docker gcc git python3 python3-dev py3-pip musl-dev \
-        linux-headers curl grep shadow tzdata wget bash tar rclone && \
+        linux-headers curl grep shadow tzdata wget bash tar && \
         rm -rf /var/cache/apk/*
+
+RUN wget https://downloads.rclone.org/v1.52.3/rclone-v1.52.3-linux-arm64.zip -O rclone.zip --no-check-certificate && \
+    unzip rclone.zip && rm rclone.zip && \
+    mv rclone*/rclone /usr/bin && rm -r rclone* && \
+    mkdir -p /rclone
 
 RUN \
   echo "**** Install s6-overlay ****" && \ 
