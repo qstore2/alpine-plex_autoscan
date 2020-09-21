@@ -15,8 +15,8 @@ RUN \
         linux-headers curl grep shadow tzdata wget bash tar && \
         rm -rf /var/cache/apk/*
 
-RUN wget https://downloads.rclone.org/v1.52.3/rclone-v1.52.3-linux-arm64.zip -O rclone.zip --no-check-certificate && \
-    unzip rclone.zip && rm rclone.zip && \
+RUN wget https://downloads.rclone.org/v1.52.3/rclone-v1.52.3-linux-arm64.zip -O rclone.zip && \
+    unzip -q rclone.zip && rm rclone.zip && \
     mv rclone*/rclone /usr/bin && rm -r rclone* && \
     mkdir -p /rclone
 
@@ -34,7 +34,7 @@ RUN \
 
 RUN \
   echo "**** install plex_autoscan ****" && \
-  git clone --depth 1 --single-branch --branch develop https://github.com/l3uddz/plex_autoscan /opt/plex_autoscan
+  git clone --depth 1 --single-branch --branch develop https://github.com/doob187/plex_autoscan /opt/plex_autoscan
 
 ENV PATH=/opt/plex_autoscan:${PATH}
 COPY scan /opt/plex_autoscan
