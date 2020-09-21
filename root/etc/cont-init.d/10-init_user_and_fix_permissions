@@ -105,7 +105,8 @@ if [[ -f "${rclonepad}" ]]; then
      echo "   copying the rclone.conf || done"
      echo " ------------------------------------"     
 fi
-
+chown -R $uid:$gid /usr/bin/rclone
+chmod 755 /usr/bin/rclone
 chown -R $uid:$gid /config
 chown -R $uid:$gid /plexDb
 find /config -type d -exec chmod 0777 \{\} \;

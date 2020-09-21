@@ -8,12 +8,18 @@ LABEL maintainer=${COMMIT_AUTHOR} \
     org.label-schema.build-date=${BUILD_DATE}
 
 RUN \
- echo "**** install build packages ****" && \
+  echo "**** install build packages ****" && \
   echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositories && \
- apk --quiet --no-cache --no-progress add \
+  apk --quiet --no-cache --no-progress add \
        docker gcc git python3 python3-dev py3-pip musl-dev \
-        linux-headers curl grep shadow tzdata wget bash tar rclone && \
-        rm -rf /var/cache/apk/*
+       linux-headers curl grep shadow tzdata wget bash tar curl && \
+       rm -rf /var/cache/apk/*
+RUN \
+  curl -O https://downloads.rclone.org/v1.52.0/rclone-v1.52.0-linux-amd64.zip && \
+  unzip -q rclone-v1.52.0-linux-amd64.zip && \
+  rm -f rclone-v1.52.0-linux-amd64.zip && \
+  cd rclone-*-linux-amd64 && \
+  cp rclone /usr/bin/
 
 RUN \
   echo "**** Install s6-overlay ****" && \ 
@@ -29,7 +35,7 @@ RUN \
 
 RUN \
   echo "**** install plex_autoscan ****" && \
-  git clone --depth 1 --single-branch --branch develop https://github.com/l3uddz/plex_autoscan /opt/plex_autoscan
+  git clone --depth 1 --single-branch --branch develop https://github.com/doob187/plex_autoscan /opt/plex_autoscan
 
 ENV PATH=/opt/plex_autoscan:${PATH}
 COPY scan /opt/plex_autoscan
