@@ -9,20 +9,22 @@ LABEL maintainer=${COMMIT_AUTHOR} \
 
 RUN \
   echo "**** install build packages ****" && \
-  echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositories && \
-  apk --quiet --no-cache --no-progress add \
-       docker gcc git python3 python3-dev py3-pip musl-dev \
-       linux-headers curl grep shadow tzdata wget bash tar curl && \
-       rm -rf /var/cache/apk/*
-RUN \
-  curl -O https://downloads.rclone.org/v1.52.0/rclone-v1.52.0-linux-amd64.zip && \
-  unzip -q rclone-v1.52.0-linux-amd64.zip && \
-  rm -f rclone-v1.52.0-linux-amd64.zip && \
-  cd rclone-*-linux-amd64 && \
-  cp rclone /usr/bin/
+  echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositories
+
+RUN apk --quiet --no-cache --no-progress add docker-cli python3 curl
+
 
 RUN \
-  echo "**** Install s6-overlay ****" && \ 
+  curl -O https://downloads.rclone.org/rclone-current-linux-amd64.zip && \
+  unzip -q rclone-current-linux-amd64.zip && \
+  rm -f rclone-current-linux-amd64.zip && \
+  cd rclone-*-linux-amd64 && \
+  cp rclone /usr/bin/ && \
+  cd .. && \
+  rm -rf rclone-*-linux-amd64
+
+RUN \
+  echo "**** Install s6-overlay ****" && \
   curl -sX GET "https://api.github.com/repos/just-containers/s6-overlay/releases/latest" | awk '/tag_name/{print $4;exit}' FS='[""]' > /etc/S6_RELEASE && \
   wget https://github.com/just-containers/s6-overlay/releases/download/`cat /etc/S6_RELEASE`/s6-overlay-amd64.tar.gz -O /tmp/s6-overlay-amd64.tar.gz >/dev/null 2>&1 && \
   tar xzf /tmp/s6-overlay-amd64.tar.gz -C / >/dev/null 2>&1 && \
@@ -30,12 +32,10 @@ RUN \
   echo "**** Installed s6-overlay `cat /etc/S6_RELEASE` ****"
 
 RUN \
-  echo "**** update pip ****" && \
-  pip -q install --upgrade pip idna==2.8
-
-RUN \
   echo "**** install plex_autoscan ****" && \
-  git clone --depth 1 --single-branch --branch develop https://github.com/doob187/plex_autoscan /opt/plex_autoscan
+  apk --quiet --no-cache --no-progress add git && \
+  git clone --depth 1 --single-branch --branch develop https://github.com/doob187/plex_autoscan /opt/plex_autoscan && \
+  apk del git
 
 ENV PATH=/opt/plex_autoscan:${PATH}
 COPY scan /opt/plex_autoscan
@@ -43,8 +43,12 @@ COPY scan /opt/plex_autoscan
 # install pip requirements
 RUN \
     echo "**** install requirements ****" && \
+    apk --quiet --no-cache --no-progress --virtual .build-deps add gcc python3-dev py3-pip musl-dev linux-headers && \
+    echo "**** update pip ****" && \
+    pip -q install --upgrade pip idna==2.8 && \
     python3 -m pip -q install --no-cache-dir -r /opt/plex_autoscan/requirements.txt && \
-    ln -s /opt/plex_autoscan/config /config
+    ln -s /opt/plex_autoscan/config /config && \
+    apk del .build-deps
 
 # environment variables to keep the init script clean
 ENV DOCKER_CONFIG=/home/plexautoscan/docker_config.json PLEX_AUTOSCAN_CONFIG=/config/config.json PLEX_AUTOSCAN_LOGFILE=/config/plex_autoscan.log PLEX_AUTOSCAN_LOGLEVEL=INFO PLEX_AUTOSCAN_QUEUEFILE=/config/queue.db PLEX_AUTOSCAN_CACHEFILE=/config/cache.db
