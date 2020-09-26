@@ -11,7 +11,7 @@ RUN \
   echo "**** install build packages ****" && \
   echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositories
 
-RUN apk --quiet --no-cache --no-progress add docker-cli python3 curl
+RUN apk --quiet --no-cache --no-progress add docker-cli python3 py3-pip curl grep shadow
 
 
 RUN \
@@ -35,7 +35,7 @@ RUN \
   echo "**** install plex_autoscan ****" && \
   apk --quiet --no-cache --no-progress add git && \
   git clone --depth 1 --single-branch --branch develop https://github.com/doob187/plex_autoscan /opt/plex_autoscan && \
-  apk del git
+  apk --quiet --no-cache --no-progress del git
 
 ENV PATH=/opt/plex_autoscan:${PATH}
 COPY scan /opt/plex_autoscan
@@ -43,12 +43,16 @@ COPY scan /opt/plex_autoscan
 # install pip requirements
 RUN \
     echo "**** install requirements ****" && \
-    apk --quiet --no-cache --no-progress --virtual .build-deps add gcc python3-dev py3-pip musl-dev linux-headers && \
+    apk --quiet --no-cache --no-progress --virtual .build-deps add gcc python3-dev musl-dev linux-headers && \
+    echo "**** update pip ****" && \
+    apk --quiet --no-cache --no-progress --virtual .build-deps add gcc python3-dev musl-dev linux-headers && \
     echo "**** update pip ****" && \
     pip -q install --upgrade pip idna==2.8 && \
     python3 -m pip -q install --no-cache-dir -r /opt/plex_autoscan/requirements.txt && \
     ln -s /opt/plex_autoscan/config /config && \
-    apk del .build-deps
+    apk --quiet --no-cache --no-progress del .build-deps
+
+RUN addgroup -g 998 docker
 
 # environment variables to keep the init script clean
 ENV DOCKER_CONFIG=/home/plexautoscan/docker_config.json PLEX_AUTOSCAN_CONFIG=/config/config.json PLEX_AUTOSCAN_LOGFILE=/config/plex_autoscan.log PLEX_AUTOSCAN_LOGLEVEL=INFO PLEX_AUTOSCAN_QUEUEFILE=/config/queue.db PLEX_AUTOSCAN_CACHEFILE=/config/cache.db
@@ -64,5 +68,4 @@ HEALTHCHECK --interval=20s --timeout=10s --start-period=10s --retries=5 \
     CMD ["/bin/bash", "/healthcheck-plex_autoscan.sh"]
 # expose port for http
 EXPOSE 3468/tcp
-ENTRYPOINT ["/bin/bash", "-c"]
-CMD ["/init"]
+ENTRYPOINT ["/init"]
