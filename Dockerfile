@@ -11,7 +11,7 @@ RUN \
   echo "**** install build packages ****" && \
   echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositories
 
-RUN apk --quiet --no-cache --no-progress add docker-cli python3 py3-pip curl grep shadow
+RUN apk --quiet --no-cache --no-progress add docker-cli python3 py3-pip curl grep shadow bash
 
 
 RUN \
