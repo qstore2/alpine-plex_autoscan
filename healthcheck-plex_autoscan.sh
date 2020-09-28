@@ -1,4 +1,4 @@
-#! /bin/sh
+#!/usr/bin/with-contenv bash
 
 if [ ! -f ${PLEX_AUTOSCAN_CONFIG} ]
 then

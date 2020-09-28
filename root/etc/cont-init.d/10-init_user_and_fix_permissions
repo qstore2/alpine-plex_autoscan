@@ -106,6 +106,7 @@ if [[ -f "${rclonepad}" ]]; then
      echo " ------------------------------------"     
 fi
 chown -R $uid:$gid /usr/bin/rclone
+chown -R $uid:$gid /root
 chmod 755 /usr/bin/rclone
 chown -R $uid:$gid /config
 chown -R $uid:$gid /plexDb
